@@ -1,0 +1,47 @@
+public void ConvertPDFA(string source, string destination, string title, string author, string subject, string creator)
+        {
+            try
+            {
+                StreamReader stream_Profiler = new StreamReader(ConstantVariables.PROFILER);
+
+                PdfWriter writer = new PdfWriter(destination, new WriterProperties().SetFullCompressionMode(true).SetCompressionLevel(9));
+                //new PdfWriter(destination)
+
+                using (PdfADocument pdf = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1A, new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", stream_Profiler.BaseStream)))
+                {
+                    PdfMerger merger = new PdfMerger(pdf);
+                    PdfReader reader = new PdfReader(source);
+
+                    PdfDocument SourcePdf = new PdfDocument(reader);
+                    merger.Merge(SourcePdf, 1, SourcePdf.GetNumberOfPages());
+                    SourcePdf.Close();
+
+                    Document document = new Document(pdf);
+                    pdf.SetTagged();
+
+                    #region Black & White
+
+
+                    #endregion
+
+                    PdfDocumentInfo info = pdf.GetDocumentInfo();
+                    info
+                            .SetTitle(title)
+                            .SetAuthor(author)
+                            .SetSubject(subject)
+                            .SetCreator(creator)
+                            //.SetKeywords("Metadata, iText, PDF")
+                            //.SetCreator("My program using iText")
+                            .AddCreationDate();
+                    pdf.SetTagged();
+
+                    document.Close();
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message.ToString());
+            }
+
+        }
