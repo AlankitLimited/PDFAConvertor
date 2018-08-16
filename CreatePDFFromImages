@@ -1,0 +1,34 @@
+public void CreatePDFFromBWImage(string SourcePDF, List<string> imageList)
+        {
+            string tempOut = Path.Combine(Path.GetDirectoryName(SourcePDF), "_temp" + Path.GetFileName(SourcePDF));
+
+            iText.Layout.Element.Image image = new iText.Layout.Element.Image(ImageDataFactory.Create(imageList[0]));
+
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(tempOut));
+            Document doc = new Document(pdfDoc);
+            for (int i = 0; i < imageList.Count; i++)
+            {
+
+                Bitmap bmp = new Bitmap(imageList[i]);
+                
+                image = new iText.Layout.Element.Image(ImageDataFactory.Create(imageList[i]));
+                float ww = (image.GetImageWidth() / 100) * 36;
+                float hh = (image.GetImageHeight() / 100) * 36;
+
+                iText.Kernel.Geom.PageSize pgSz = new iText.Kernel.Geom.PageSize(ww, hh);
+                pdfDoc.AddNewPage(pgSz);
+                image.ScaleAbsolute(pgSz.GetWidth(), pgSz.GetHeight());
+
+                image.SetFixedPosition(i + 1, 0, 0);
+
+                doc.Add(image);
+                bmp.Dispose();
+            }
+            pdfDoc.Close();
+            doc.Close();
+
+
+            File.Copy(tempOut, SourcePDF, true);
+            File.Delete(tempOut);
+
+        }
